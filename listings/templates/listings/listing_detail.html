@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ listing.title }}{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+    <!-- Галерея -->
+    <div class="gallery">
+        {% if photos %}
+        <img src="{{ photos.0.photo.url }}" alt="{{ listing.title }}" class="gallery-main" id="mainPhoto">
+        {% if photos.count > 1 %}
+        <div class="gallery-thumbs">
+            {% for photo in photos %}
+            <img src="{{ photo.photo.url }}" alt="Фото {{ forloop.counter }}"
+                 class="gallery-thumb {% if forloop.first %}active{% endif %}"
+                 onclick="changePhoto(this, '{{ photo.photo.url }}')">
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <img src="{% static 'images/placeholder.png' %}" alt="Нет фото" class="gallery-main">
+        {% endif %}
+    </div>
+
+    <!-- Информация -->
+    <h1 class="detail-title">{{ listing.title }}</h1>
+    <p class="detail-price">{{ listing.price|floatformat:0 }} ₽</p>
+
+    <div class="detail-info">
+        <div class="detail-info-item">
+            <span class="label">Тип сделки</span>
+            <span class="value">{{ listing.get_deal_type_display }}</span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Категория</span>
+            <span class="value">{{ listing.category }}</span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Площадь</span>
+            <span class="value">{{ listing.area }} м²</span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Комнат</span>
+            <span class="value">{{ listing.rooms }}</span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Город</span>
+            <span class="value">{{ listing.city }}</span>
+        </div>
+        {% if listing.district %}
+        <div class="detail-info-item">
+            <span class="label">Район</span>
+            <span class="value">{{ listing.district }}</span>
+        </div>
+        {% endif %}
+        <div class="detail-info-item">
+            <span class="label">Адрес</span>
+            <span class="value">{{ listing.address }}</span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Дата публикации</span>
+            <span class="value">{{ listing.created_at|date:"d.m.Y" }}</span>
+        </div>
+    </div>
+
+    <div class="detail-description">
+        <h3>Описание</h3>
+        <p>{{ listing.description|linebreaksbr }}</p>
+    </div>
+
+    <div class="detail-contact">
+        <h3>Контакты продавца</h3>
+        <p><strong>{{ listing.author.username }}</strong></p>
+        <p>Телефон: <a href="tel:{{ listing.phone }}">{{ listing.phone }}</a></p>
+    </div>
+</div>
+
+<script>
+function changePhoto(thumb, url) {
+    document.getElementById('mainPhoto').src = url;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+}
+</script>
+{% endblock %}

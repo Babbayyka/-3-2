@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Избранное{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Избранное</h1>
+
+{% if favorites %}
+<div class="cards-grid">
+    {% for fav in favorites %}
+    <div class="card">
+        {% if fav.listing.photos.first %}
+        <img src="{{ fav.listing.photos.first.photo.url }}" alt="{{ fav.listing.title }}" class="card-image">
+        {% else %}
+        <img src="{% static 'images/placeholder.png' %}" alt="Нет фото" class="card-image">
+        {% endif %}
+        <div class="card-body">
+            <h3 class="card-title">
+                <a href="{% url 'listing_detail' fav.listing.slug %}">{{ fav.listing.title|truncatechars:70 }}</a>
+            </h3>
+            <p class="card-price">{{ fav.listing.price|floatformat:0 }} ₽</p>
+            <p class="card-info">
+                <span>{{ fav.listing.area }} м²</span>
+                <span>{{ fav.listing.rooms }} комн.</span>
+                <span>{{ fav.listing.city }}</span>
+            </p>
+            <a href="{% url 'toggle_favorite' fav.listing.slug %}?next={% url 'favorites' %}" class="btn-favorite active">
+                ♥ Убрать из избранного
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>В избранном пока пусто</h3>
+    <p>Добавляйте понравившиеся объявления, нажимая ♥</p>
+    <a href="{% url 'catalog' %}" class="btn btn-primary">Перейти в каталог</a>
+</div>
+{% endif %}
+{% endblock %}

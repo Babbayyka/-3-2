@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Каталог{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Каталог недвижимости</h1>
+
+<div class="catalog-layout">
+    <!-- Фильтры -->
+    <aside class="filters-panel">
+        <h3>Фильтры</h3>
+        <form method="get">
+            {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+            {% endif %}
+
+            <div class="filter-group">
+                <label for="id_deal_type">Тип сделки</label>
+                {{ filter.form.deal_type }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_category">Категория</label>
+                {{ filter.form.category }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_price_min">Цена от</label>
+                {{ filter.form.price_min }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_price_max">Цена до</label>
+                {{ filter.form.price_max }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_area_min">Площадь от (м²)</label>
+                {{ filter.form.area_min }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_area_max">Площадь до (м²)</label>
+                {{ filter.form.area_max }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_rooms">Комнат</label>
+                {{ filter.form.rooms }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_city">Город</label>
+                {{ filter.form.city }}
+            </div>
+
+            <div class="filter-group">
+                <label for="id_district">Район</label>
+                {{ filter.form.district }}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Применить</button>
+            <a href="{% url 'catalog' %}" class="btn btn-outline" style="width:100%; margin-top:10px; text-align:center; display:block;">Сбросить</a>
+        </form>
+    </aside>
+
+    <!-- Список объявлений -->
+    <div class="catalog-results">
+        <!-- Сортировка -->
+        <div class="sort-bar">
+            <span>Сортировка:</span>
+            <a href="?sort=-created_at{% if search_query %}&q={{ search_query }}{% endif %}" class="sort-link {% if current_sort == '-created_at' %}active{% endif %}">Новые</a>
+            <a href="?sort=price_asc{% if search_query %}&q={{ search_query }}{% endif %}" class="sort-link {% if current_sort == 'price_asc' %}active{% endif %}">Дешевле</a>
+            <a href="?sort=price_desc{% if search_query %}&q={{ search_query }}{% endif %}" class="sort-link {% if current_sort == 'price_desc' %}active{% endif %}">Дороже</a>
+            <a href="?sort=area_desc{% if search_query %}&q={{ search_query }}{% endif %}" class="sort-link {% if current_sort == 'area_desc' %}active{% endif %}">Площадь ↓</a>
+            <a href="?sort=area_asc{% if search_query %}&q={{ search_query }}{% endif %}" class="sort-link {% if current_sort == 'area_asc' %}active{% endif %}">Площадь ↑</a>
+        </div>
+
+        {% if page_obj %}
+        <div class="cards-grid">
+            {% for listing in page_obj %}
+            <div class="card">
+                {% if listing.photos.first %}
+                <img src="{{ listing.photos.first.photo.url }}" alt="{{ listing.title }}" class="card-image">
+                {% else %}
+                <img src="{% static 'images/placeholder.png' %}" alt="Нет фото" class="card-image">
+                {% endif %}
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <a href="{% url 'listing_detail' listing.slug %}">{{ listing.title|truncatechars:70 }}</a>
+                    </h3>
+                    <p class="card-price">{{ listing.price|floatformat:0 }} ₽</p>
+                    <p class="card-info">
+                        <span>{{ listing.area }} м²</span>
+                        <span>{{ listing.rooms }} комн.</span>
+                        <span>{{ listing.city }}</span>
+                    </p>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'toggle_favorite' listing.slug %}?next={{ request.get_full_path|urlencode }}" class="btn-favorite {% if user in listing.favorited_by_users %}active{% endif %}">♥</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}">&laquo; Назад</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="current">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}&sort={{ current_sort }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}">Вперёд &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+            <h3>Ничего не найдено</h3>
+            <p>Попробуйте изменить параметры фильтрации.</p>
+            <a href="{% url 'catalog' %}" class="btn btn-primary">Сбросить фильтры</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

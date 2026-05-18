@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Найдите идеальную недвижимость</h1>
+    <p>Продажа и покупка квартир, домов, участков и коммерческой недвижимости</p>
+    <form method="get" action="{% url 'catalog' %}" class="search-form">
+        <input type="text" name="q" placeholder="Поиск по объявлениям..." minlength="2" maxlength="100">
+        <button type="submit" class="btn btn-primary">Найти</button>
+    </form>
+</div>
+
+<h2 class="page-title">Свежие объявления</h2>
+
+{% if listings %}
+<div class="cards-grid">
+    {% for listing in listings %}
+    <div class="card">
+        {% if listing.photos.first %}
+        <img src="{{ listing.photos.first.photo.url }}" alt="{{ listing.title }}" class="card-image">
+        {% else %}
+        <img src="{% static 'images/placeholder.png' %}" alt="Нет фото" class="card-image">
+        {% endif %}
+        <div class="card-body">
+            <h3 class="card-title">
+                <a href="{% url 'listing_detail' listing.slug %}">
+                    {{ listing.title|truncatechars:70 }}
+                </a>
+            </h3>
+            <p class="card-price">{{ listing.price|floatformat:0 }} ₽</p>
+            <p class="card-info">
+                <span>{{ listing.category }}</span>
+                <span>{{ listing.city }}</span>
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>Пока нет объявлений</h3>
+    <p>Будьте первым, кто разместит объявление!</p>
+</div>
+{% endif %}
+{% endblock %}

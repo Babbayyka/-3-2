@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+
+<div class="detail-page">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="form-errors">
+                {% for error in field.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <h3 style="margin: 20px 0 10px;">Фотографии</h3>
+        {{ formset.management_form }}
+        {% for photo_form in formset %}
+        <div class="form-group">
+            {{ photo_form.photo }}
+            {% if photo_form.photo.value %}
+            <small>Текущий файл: {{ photo_form.photo.value }}</small>
+            {% endif %}
+            {% if photo_form.DELETE %}
+            <label>{{ photo_form.DELETE }} Удалить</label>
+            {% endif %}
+            {{ photo_form.id }}
+            {% for error in photo_form.errors.values %}
+            <div class="form-errors"><p>{{ error }}</p></div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-danger">Отмена</a>
+    </form>
+</div>
+{% endblock %}

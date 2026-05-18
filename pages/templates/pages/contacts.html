@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Контакты{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+    <h1 class="page-title">Контакты</h1>
+
+    <div class="detail-info" style="margin-bottom: 20px;">
+        <div class="detail-info-item">
+            <span class="label">Адрес</span>
+            <span class="value">г. Москва, ул. Примерная, д. 1, офис 101</span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Телефон</span>
+            <span class="value"><a href="tel:+74951234567">+7 (495) 123-45-67</a></span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Email</span>
+            <span class="value"><a href="mailto:info@realtyservice.ru">info@realtyservice.ru</a></span>
+        </div>
+        <div class="detail-info-item">
+            <span class="label">Режим работы</span>
+            <span class="value">Пн-Пт: 9:00 - 18:00</span>
+        </div>
+    </div>
+
+    <p>Если у вас есть вопросы или предложения, свяжитесь с нами любым удобным способом.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Личный кабинет</h1>
+
+<p style="margin-bottom: 20px;">
+    <a href="{% url 'listing_create' %}" class="btn btn-success">+ Подать объявление</a>
+</p>
+
+{% if listings %}
+<table class="dashboard-table">
+    <thead>
+        <tr>
+            <th>Заголовок</th>
+            <th>Цена</th>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for listing in listings %}
+        <tr>
+            <td><a href="{% url 'listing_detail' listing.slug %}">{{ listing.title|truncatechars:50 }}</a></td>
+            <td>{{ listing.price|floatformat:0 }} ₽</td>
+            <td>{{ listing.created_at|date:"d.m.Y" }}</td>
+            <td>{% if listing.is_active %}Активно{% else %}Неактивно{% endif %}</td>
+            <td>
+                <a href="{% url 'listing_update' listing.slug %}" class="btn btn-primary" style="padding:5px 10px; font-size:0.85rem;">Редактировать</a>
+                <a href="{% url 'listing_delete' listing.slug %}" class="btn btn-danger" style="padding:5px 10px; font-size:0.85rem;">Удалить</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <h3>У вас пока нет объявлений</h3>
+    <p>Разместите своё первое объявление!</p>
+</div>
+{% endif %}
+{% endblock %}
